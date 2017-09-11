@@ -25,17 +25,19 @@ import java.util.List;
 public class CriminalListFragment extends Fragment {
     private RecyclerView mCrimeRecyclerView;
     private CrimeAdapter mAdapter;
+    private int mPosition;
 
     @Override
-    public View onCreateView(LayoutInflater inflater,  ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_crime_list,container,false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_crime_list, container, false);
 
-        mCrimeRecyclerView = (RecyclerView)view.findViewById(R.id.crime_recycler_view);
+        mCrimeRecyclerView = (RecyclerView) view.findViewById(R.id.crime_recycler_view);
         mCrimeRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         updateUI();
         return view;
     }
-    private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+
+    private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private Crime mCrime;
         private TextView mTitleTextView;
@@ -44,25 +46,29 @@ public class CriminalListFragment extends Fragment {
 
         public CrimeHolder(View itemView) {
             super(itemView);
-            mTitleTextView = (TextView)itemView.findViewById(R.id.list_item_crime_title_text_view);
-            mDateTextView = (TextView)itemView.findViewById(R.id.list_item_crime_date_text_view);
+            mTitleTextView = (TextView) itemView.findViewById(R.id.list_item_crime_title_text_view);
+            mDateTextView = (TextView) itemView.findViewById(R.id.list_item_crime_date_text_view);
             mSolvedCheckBox = (CheckBox) itemView.findViewById(R.id.list_item_crime_solved_check_box);
             itemView.setOnClickListener(this);
         }
+
         @Override
-        public void onClick(View v){
-            Intent intent = CriminalActivity.newIntent(getActivity(),mCrime.getId());
+        public void onClick(View v) {
+            Intent intent = CriminalActivity.newIntent(getActivity(), mCrime.getId());
+            mPosition = mCrimeRecyclerView.getChildAdapterPosition(v);
             startActivity(intent);
         }
-        public void  bindCrime(Crime crime){
+
+        public void bindCrime(Crime crime) {
             mCrime = crime;
             mTitleTextView.setText(mCrime.getTitle());
-            String mDate = (String) DateFormat.format("yyyy, MMMM dd日,EEEE, kk:mm",mCrime.getDate());
+            String mDate = (String) DateFormat.format("yyyy, MMMM dd日,EEEE, kk:mm", mCrime.getDate());
             mDateTextView.setText(mDate);
             mSolvedCheckBox.setChecked(mCrime.isSolved());
         }
     }
-    private class CrimeAdapter extends RecyclerView.Adapter<CrimeHolder>{
+
+    private class CrimeAdapter extends RecyclerView.Adapter<CrimeHolder> {
         private List<Crime> mCrimes;
 
         public CrimeAdapter(List<Crime> crimes) {
@@ -72,7 +78,7 @@ public class CriminalListFragment extends Fragment {
         @Override
         public CrimeHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            View view = layoutInflater.inflate(R.layout.list_item_crime,parent,false);
+            View view = layoutInflater.inflate(R.layout.list_item_crime, parent, false);
             return new CrimeHolder(view);
         }
 
@@ -88,11 +94,21 @@ public class CriminalListFragment extends Fragment {
         }
     }
 
-    public void updateUI(){
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateUI();
+    }
+
+    public void updateUI() {
         CrimeLab crimeLab = CrimeLab.get(getActivity());
         List<Crime> crimes = crimeLab.getCrimes();
 
-        mAdapter = new CrimeAdapter(crimes);
-        mCrimeRecyclerView.setAdapter(mAdapter);
+        if (mAdapter == null) {
+            mAdapter = new CrimeAdapter(crimes);
+            mCrimeRecyclerView.setAdapter(mAdapter);
+        } else {
+            mAdapter.notifyItemChanged(mPosition);
+        }
     }
 }
