@@ -1,5 +1,6 @@
 package com.bignerdranch.wow.criminalintent;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -50,8 +51,8 @@ public class CriminalListFragment extends Fragment {
         }
         @Override
         public void onClick(View v){
-            Toast.makeText(getActivity(),
-                    mCrime.getTitle() + "Clicked",Toast.LENGTH_SHORT).show();
+            Intent intent = CriminalActivity.newIntent(getActivity(),mCrime.getId());
+            startActivity(intent);
         }
         public void  bindCrime(Crime crime){
             mCrime = crime;
