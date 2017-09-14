@@ -54,7 +54,7 @@ public class CriminalListFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-            Intent intent = CriminalActivity.newIntent(getActivity(), mCrime.getId());
+            Intent intent = CrimePagerActivity.newIntent(getActivity(), mCrime.getId());
             mPosition = mCrimeRecyclerView.getChildAdapterPosition(v);
             startActivity(intent);
         }
