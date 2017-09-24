@@ -23,9 +23,9 @@ import java.util.UUID;
 
 
 public class CriminalFragment extends Fragment{
-    private Crime mCrime;
+    private  Crime mCrime;
     private EditText mTitleField;
-    private Button mDateButton;
+    private  Button mDateButton;
     private Button mTimeButton;
     private CheckBox mSolvedCheckBox;
     private static final String ARG_CRIME_ID = "crime_id";
@@ -69,9 +69,8 @@ public class CriminalFragment extends Fragment{
             @Override
             public void onClick(View view) {
                 FragmentManager manager = getFragmentManager();
-                DatePickerFragment dialog = DatePickerFragment.newInstance(mCrime.getDate());
-                dialog.setTargetFragment(CriminalFragment.this,REQUEST_DATE);
-                dialog.show(manager,DIALOG_DATE);
+                Intent intent = DatePickerActivity.newInstance(getActivity(),mCrime.getDate());
+                startActivityForResult(intent,REQUEST_DATE);//如果使用getactivity().startActivityForResult()则只有Activity的onActivityResult执行，不用则都执行。
             }
         });
         mTimeButton = (Button)v.findViewById(R.id.crime_time);
@@ -105,8 +104,21 @@ public class CriminalFragment extends Fragment{
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode != Activity.RESULT_OK){
+        if (resultCode != Activity.RESULT_OK) {
             return;
+        }
+        /*if (requestCode == REQUEST_DATE){
+            Date date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
+
+            mCrime.setDate(date);
+            updateDate();
+        }*/
+        if (requestCode == REQUEST_TIME){
+            Date date = (Date)data.getSerializableExtra(TimePickerFragment.EXTRA_TIME);
+
+            mCrime.setDate(date);
+            updateDate();
+
         }
         if (requestCode == REQUEST_DATE){
             Date date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
@@ -114,13 +126,8 @@ public class CriminalFragment extends Fragment{
             mCrime.setDate(date);
             updateDate();
         }
-        if (requestCode == REQUEST_TIME){
-            Date date = (Date)data.getSerializableExtra(TimePickerFragment.EXTRA_TIME);
-
-            mCrime.setDate(date);
-            updateDate();
-        }
     }
+
 
     private void updateDate() {
         String mDate = (String) DateFormat.format("yyyy, MMMM dd日,EEEE, kk:mm",mCrime.getDate());

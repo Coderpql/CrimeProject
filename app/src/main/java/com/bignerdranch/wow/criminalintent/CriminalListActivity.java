@@ -11,4 +11,5 @@ public class CriminalListActivity extends SingleFragmentActivity {
     protected Fragment createFragment() {
         return new CriminalListFragment();
     }
+
 }
